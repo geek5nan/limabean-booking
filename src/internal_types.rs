@@ -105,7 +105,20 @@ where
         use BookedOrUnbookedPosting::*;
 
         match self {
-            Booked(booked) => Some(booked.units),
+            // For a booked posting, if it has cost adjustments, the weight for balancing
+            // is the cost-basis value (sum of units * per_unit for each lot adjustment),
+            // not the commodity units. This follows Beancount's weight rules:
+            // https://beancount.github.io/docs/beancount_language_syntax.html#balancing-rule-the-weight-of-postings
+            Booked(booked) => {
+                if let Some(ref costs) = booked.cost {
+                    let weight: B::Number = costs.adjustments.iter()
+                        .map(|adj| (adj.units * adj.per_unit).rescaled(adj.units.scale()))
+                        .sum();
+                    Some(weight)
+                } else {
+                    Some(booked.units)
+                }
+            },
             Unbooked(unbooked) => {
                 let p = &unbooked.posting;
 
