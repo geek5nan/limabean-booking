@@ -117,7 +117,7 @@ where
 
     let interpolated_postings = interpolated_postings
         .into_iter()
-        .map(|p| p.unwrap())
+        .flatten()
         .collect::<Vec<_>>();
 
     Ok(BookingsAndResiduals {
@@ -134,7 +134,7 @@ where
     B: BookingTypes,
     P: PostingSpec<Types = B>,
 {
-    interpolated_postings: Vec<Option<Interpolated<B, P>>>,
+    interpolated_postings: Vec<Vec<Interpolated<B, P>>>,
     updated_inventory: Inventory<B>,
     residuals: Residuals<B::Currency, B::Number>,
 }
@@ -146,7 +146,7 @@ where
 {
     fn new(n_postings: usize) -> Self {
         BookingAccumulator {
-            interpolated_postings: repeat_n(None, n_postings).collect::<Vec<_>>(),
+            interpolated_postings: repeat_n(vec![], n_postings).collect::<Vec<_>>(),
             updated_inventory: Inventory::default(),
             residuals: Residuals::<B::Currency, B::Number>::default(),
         }
@@ -219,7 +219,7 @@ where
 
     for (p, _) in booked_and_unbooked_postings.into_iter() {
         let idx = p.idx;
-        accumulator.interpolated_postings[idx] = Some(p);
+        accumulator.interpolated_postings[idx].push(p);
     }
 
     Ok(())

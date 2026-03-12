@@ -403,7 +403,7 @@ where
     P: PostingSpec<Types = B>,
 {
     pub(crate) posting: P,
-    pub(crate) idx: usize,
+    pub idx: usize,
     pub units: B::Number,
     pub currency: B::Currency,
     pub cost: Option<PostingCosts<B>>,

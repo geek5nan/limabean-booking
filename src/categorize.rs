@@ -201,15 +201,13 @@ where
             let sole_bucket = all_buckets.into_iter().next().unwrap();
             currency_groups.push_or_insert(sole_bucket, auto_posting);
         } else {
-            return Err(BookingError::Transaction(
-                TransactionBookingError::AutoPostMultipleBuckets(
-                    all_buckets
-                        .into_iter()
-                        .map(|cur| cur.to_string())
-                        .collect::<Vec<_>>(),
-                ),
-            ));
-        }
+                // Multi-bucket auto-post: clone the auto-post into each bucket.
+                // Each bucket's interpolation step will independently compute the
+                // balancing amount as the negative residual for that currency.
+                for bucket in all_buckets {
+                    currency_groups.push_or_insert(bucket, auto_posting.clone());
+                }
+            }
     } else {
         for (bucket, auto_posting) in auto_postings.into_iter() {
             let bucket = bucket.unwrap();
