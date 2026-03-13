@@ -1,7 +1,7 @@
 use hashbrown::{HashMap, hash_map::Entry};
 use std::{fmt::Debug, hash::Hash, ops::Deref};
 
-use super::{BookingTypes, CostSpec, Interpolated, Number, PostingSpec, PriceSpec};
+use super::{BookingTypes, CostSpec, Interpolated, PostingSpec, PriceSpec};
 
 #[derive(Debug)]
 pub(crate) struct HashMapOfVec<K, V>(HashMap<K, Vec<V>>);
@@ -112,13 +112,13 @@ where
             Booked(booked) => {
                 if let Some(ref costs) = booked.cost {
                     let weight: B::Number = costs.adjustments.iter()
-                        .map(|adj| (adj.units * adj.per_unit).rescaled(adj.units.scale()))
+                        .map(|adj| adj.units * adj.per_unit)
                         .sum();
                     Some(weight)
                 } else {
                     Some(booked.units)
                 }
-            },
+            }
             Unbooked(unbooked) => {
                 let p = &unbooked.posting;
 
@@ -126,7 +126,7 @@ where
                     match (cost_spec.total(), cost_spec.per_unit(), p.units()) {
                         (Some(cost_total), _, _) => Some(cost_total),
                         (None, Some(cost_per_unit), Some(units)) => {
-                            let weight = (cost_per_unit * units).rescaled(units.scale());
+                            let weight = cost_per_unit * units;
                             Some(weight)
                         }
                         _ => None,
@@ -135,7 +135,7 @@ where
                     match (price_spec.total(), price_spec.per_unit(), p.units()) {
                         (Some(price_total), _, _) => Some(price_total),
                         (None, Some(price_per_unit), Some(units)) => {
-                            let weight = (price_per_unit * units).rescaled(units.scale());
+                            let weight = price_per_unit * units;
                             Some(weight)
                         }
                         _ => None,
