@@ -402,8 +402,8 @@ where
     B: BookingTypes,
     P: PostingSpec<Types = B>,
 {
-    pub(crate) posting: &'p P,
-    pub(crate) idx: usize,
+    pub posting: &'p P,
+    pub idx: usize,
     pub units: B::Number,
     pub currency: B::Currency,
     pub cost: Option<PostingCosts<B>>,
