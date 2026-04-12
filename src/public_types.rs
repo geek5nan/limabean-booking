@@ -314,6 +314,8 @@ where
     pub per_unit: B::Number,
     pub total: Option<B::Number>,
     pub currency: B::Currency,
+    /// Whether the user wrote `@@` (total price) rather than `@` (per-unit).
+    pub is_total: bool,
 }
 
 impl<B> Display for Price<B>

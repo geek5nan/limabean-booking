@@ -160,6 +160,7 @@ where
 
         (Some(UnitsAndConversion { units, conversion }), Some(currency), None, Some(_price)) => {
             // price without cost
+            let price_is_total = _price.total().is_some() && _price.per_unit().is_none();
             match (conversion, annotated.price_currency) {
                 (Some(conversion), Some(price_currency)) => Ok((
                     Interpolated {
@@ -172,6 +173,7 @@ where
                             per_unit: conversion.per_unit,
                             total: Some(conversion.total),
                             currency: price_currency,
+                            is_total: price_is_total,
                         }),
                     },
                     false,
